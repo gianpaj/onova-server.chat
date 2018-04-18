@@ -1,3 +1,15 @@
 {
-  "presets": ["es2015"]
+  "presets": [
+    ["env", {
+      "targets": {
+        "node": "current"
+      }
+    }],
+    "flow"
+  ],
+  "plugins": [
+    ["transform-object-rest-spread", { "useBuiltIns": true }]
+  ],
+  "sourceMaps": "inline",
+  "retainLines": true
 }
