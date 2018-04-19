@@ -94,10 +94,7 @@ app.post(config.ENDPOINT, (req, res, next) => {
           });
       });
   } else {
-    res.status(500).json({
-      ok: false,
-      error: e,
-    });
+    res.status(500);
   }
 });
 
