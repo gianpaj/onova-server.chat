@@ -6,7 +6,7 @@ import Chatkit from 'pusher-chatkit-server';
 const config = require('./config');
 
 const app = express();
-const port = process.env.PORT | 8142;
+const port = process.env.PORT || 8142;
 const configJSON = require('./config.json');
 const chatkit = new Chatkit({
   instanceLocator: configJSON.chatkit.instanceLocator,
@@ -93,6 +93,11 @@ app.post(config.ENDPOINT, (req, res, next) => {
             });
           });
       });
+  } else {
+    res.status(500).json({
+      ok: false,
+      error: e,
+    });
   }
 });
 
