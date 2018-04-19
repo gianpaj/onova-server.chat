@@ -1,8 +1,8 @@
 {
   "name": "onova.server.push",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "dependencies": {
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
@@ -15,7 +15,6 @@
     "express": "^4.16.3",
     "morgan": "1.9.0",
     "node-persist": "^2.1.0",
-    "pusher": "^1.5.1",
     "pusher-chatkit-server": "^0.11.2",
     "request": "^2.83.0",
     "rxjs": "^5.5.6",
@@ -24,9 +23,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "prod:build": "rimraf lib && babel *.js -d lib --ignore .test.js && cp -r config.json ./lib",
-    "prod:start": "node lib/index.js",
+    "prod:start": "node lib/server.js",
     "start": "yarn prod:build && yarn prod:start",
-    "dev:start": "nodemon --ignore lib --exec babel-node index.js",
+    "dev:start": "nodemon --ignore lib --exec babel-node server.js",
     "dev:start-server": "nodemon --ignore lib --exec babel-node server.js"
   },
   "devDependencies": {
@@ -53,10 +52,9 @@
   },
   "private": true,
   "author": "Onova Team <hello@onova.co>",
-  "license": "MIT",
   "nodemonConfig": {
     "ignore": [
-      "dist/*"
+      "lib/*"
     ],
     "delay": "2500"
   }

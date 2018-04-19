@@ -1,5 +1,5 @@
 .node-persist/
-dist/
+lib/
 node_modules/
 .idea/
 config.json
