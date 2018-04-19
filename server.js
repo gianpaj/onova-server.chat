@@ -72,26 +72,13 @@ app.post(config.ENDPOINT, (req, res, next) => {
       })
       .then(() => {
         console.log('updatePermissionsForGlobalRole Success');
-        chatkit
-          .createUser({
-            id: user_id,
-            avatarURL,
-            name: username,
-          })
-          .then(() => {
-            console.log(token);
-            console.log(auth);
-            return res.json(auth);
-          })
-          .catch(e => {
-            if (e.error_type == 'services/chatkit/user_already_exists') {
-              return res.json(auth);
-            }
-            res.status(500).json({
-              ok: false,
-              error: e,
-            });
-          });
+        return res.json(auth);
+      })
+      .catch(e => {
+        res.status(500).json({
+          ok: false,
+          error: e,
+        });
       });
   } else {
     res.status(500);
