@@ -22,8 +22,10 @@ export class ChatkitHelper {
 
   getRoomMessages(userId: string, roomId: number, limit: number): Observable {
     return Rx.Observable.fromPromise(
-      this.chatkitInstance.getRoomMessages(userId, roomId, {
-        limit: limit,
+      this.chatkitInstance.getRoomMessages({
+        userId,
+        roomId,
+        limit,
       })
     );
   }
@@ -73,12 +75,14 @@ export class ChatkitHelper {
   populateUsersWithRoomsAndMessages(users, messagesLimit) {
     return Rx.Observable.combineLatest(
       ...users.map(user =>
-        Rx.Observable.fromPromise(this.chatkitInstance.getUserRooms(user.id))
+        Rx.Observable.fromPromise(
+          this.chatkitInstance.getUserRooms({ userId: user.id })
+        )
           .do(rooms => (user.rooms = rooms))
           .flatMap(rooms => {
             if (rooms.length < 1) return Rx.Observable.of([]);
 
-            Rx.Observable.combineLatest(
+            return Rx.Observable.combineLatest(
               ...rooms.map(room =>
                 this.getRoomMessages(user.id, room.id, messagesLimit).do(
                   messages => (room.messages = messages)
