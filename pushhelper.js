@@ -1,15 +1,30 @@
 import Rx from 'rxjs/Rx';
 import request from 'request';
+import Agenda from 'agenda';
 import { initSync, setItemSync, getItemSync } from 'node-persist';
 
+const config = require('./config');
+
+const JOBNAMES = {
+  PUSH_MSG: 'send-push-msg', // person to person
+};
+
 import { push } from './config.json';
+
+const agenda = new Agenda({
+  db: {
+    address: config.MONGO_URI,
+    maxConcurrency: 2,
+    defaultLockLifetime: 5000, // seconds
+  },
+});
 
 export class PushHelper {
   constructor() {
     initSync();
   }
 
-  getNotificationFromUserObject(user) {
+  getNotificationUsers(user, users) {
     const rooms = user.rooms.map(room => {
       room.messages
         .filter(
@@ -28,17 +43,19 @@ export class PushHelper {
     let title = null;
     let roomIds = rooms.map(room => room.id);
 
+    const partner = users.find(u => u.id == rooms[0].messages[0].user_id);
+    debugger;
     if (unreadMessagesCount === 1) {
       title = 'New message';
-      text = rooms[0].name + ': ' + rooms[0].messages[0].text;
-    } else if (rooms.length === 1) {
-      title = 'Unread messages';
-      text =
-        rooms[0].name +
-        ': ' +
-        'You have ' +
-        unreadMessagesCount +
-        ' unread messages';
+      text = partner.name + ': ' + rooms[0].messages[0].text;
+      // } else if (rooms.length === 1) {
+      //   title = 'Unread messages';
+      //   text =
+      //     rooms[0].name +
+      //     ': ' +
+      //     'You have ' +
+      //     unreadMessagesCount +
+      //     ' unread messages';
     } else {
       title = 'Unread messages';
       text = 'You have ' + unreadMessagesCount + ' unread messages';
@@ -51,10 +68,11 @@ export class PushHelper {
     text = text.replace(/[\s|\n|\r]{1,}/g, ' ');
 
     return {
-      title: title,
+      title,
       message: text,
       user_id: parseInt(user.id, 10),
       rooms: roomIds,
+      partner,
     };
   }
 
@@ -62,37 +80,68 @@ export class PushHelper {
     initSync();
 
     let notifications = users.map(user =>
-      this.getNotificationFromUserObject(user)
+      this.getNotificationUsers(user, users)
     );
 
-    notifications.forEach(notification => console.log(notification));
+    console.log('sendPushToUsers');
+    const Promises = notifications.map(notification => {
+      console.log(notification);
+      return new Promise((resolve, reject) => {
+        const { title, message, partner } = notification;
+        const pushData = {
+          message,
+          title,
+          // triggeredBy: sender._id,
+          triggeredType: 'User',
+          senderName: partner.name,
+          targetUser: partner.id,
+        };
 
-    return this.getAccessToken().flatMap(token =>
+        const job = agenda.create(JOBNAMES.PUSH_MSG, pushData);
+
+        return job.save(err => {
+          if (err) {
+            const e = new Error(`Job failed with error: ${err}`);
+            reject(e);
+          }
+        });
+      });
+    });
+
+    return Rx.Observable.of(Promise.all(Promises)).flatMap(() =>
       Rx.Observable.fromPromise(
         new Promise((resolve, reject) => {
-          request(
-            push.endpoint,
-            {
-              json: true,
-              strictSSL: push.strictSSL,
-              body: {
-                notifications: notifications,
-              },
-              headers: {
-                Authorization: 'Bearer ' + token.accessToken,
-              },
-              method: 'POST',
-            },
-            (error, response, body) => {
-              if (!error && response.statusCode === 200) {
-                return resolve();
-              }
-              reject([response, body]);
-            }
-          );
+          return resolve();
         })
       )
     );
+
+    // return this.getAccessToken().flatMap(token =>
+    //   Rx.Observable.fromPromise(
+    //     new Promise((resolve, reject) => {
+    //       request(
+    //         push.endpoint,
+    //         {
+    //           json: true,
+    //           strictSSL: push.strictSSL,
+    //           body: {
+    //             notifications: notifications,
+    //           },
+    //           headers: {
+    //             Authorization: 'Bearer ' + token.accessToken,
+    //           },
+    //           method: 'POST',
+    //         },
+    //         (error, response, body) => {
+    //           if (!error && response.statusCode === 200) {
+    //             return resolve();
+    //           }
+    //           reject([response, body]);
+    //         }
+    //       );
+    //     })
+    //   )
+    // );
   }
 
   /**

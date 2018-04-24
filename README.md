@@ -9,11 +9,6 @@ const Chatkit = require("pusher-chatkit-server");
 
 const config = require("./config.json");
 
-// const ckInst = new Chatkit({
-//   instanceLocator: config.chatkit.instanceLocator,
-//   key: config.chatkit.key,
-// });
-
 const ckInst = new Chatkit.default({
   instanceLocator: config.chatkit.instanceLocator,
   key: config.chatkit.key
@@ -58,4 +53,17 @@ ckInst
   .getRoomMessages({ userId: "5ac5ebcd939b7f1712b92baf", roomId: 6718789 })
   .then(res => console.log(res))
   .catch(e => console.log(e));
+
+// gets 20 users at the time
+ckInst
+  .getUsers()
+  .then(res => console.log(res))
+  .catch(e => console.log(e));
+
+temp1.forEach(u =>
+  ckInst
+    .deleteUser({ userId: u.id })
+    .then(res => console.log(res))
+    .catch(e => console.log(e))
+);
 ```

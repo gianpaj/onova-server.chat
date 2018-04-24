@@ -1,3 +1,5 @@
+// @flow
+
 import express from 'express';
 import bodyParser from 'body-parser';
 import Chatkit from 'pusher-chatkit-server';

@@ -21,9 +21,13 @@ Rx.Observable.merge(
   .do(() => console.log('Launching new job'))
   .do(() => console.time('timer'))
   .flatMap(() => ckHelper.getUsers())
-  .flatMap(users =>
-    ckHelper.populateUsersWithRoomsAndMessages(users, config.messagesToLoad)
-  )
+  .flatMap(users => {
+    console.log(`Searching messages of ${users.length} users`);
+    return ckHelper.populateUsersWithRoomsAndMessages(
+      users,
+      config.messagesToLoad
+    );
+  })
   .flatMap(users => ckHelper.populateUsersWithCursors(users))
   .map(users => ckHelper.filterUsersRoomsAndMessages(users))
   .do(users =>

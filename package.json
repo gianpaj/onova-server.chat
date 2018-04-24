@@ -4,6 +4,7 @@
   "description": "",
   "main": "server.js",
   "dependencies": {
+    "agenda": "^1.0.3",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
     "babel-eslint": "^8.2.3",
@@ -12,8 +13,10 @@
     "babel-preset-flow": "^6.23.0",
     "body-parser": "^1.18.2",
     "dotenv": "^5.0.1",
+    "esm": "^3.0.20",
     "express": "^4.16.3",
     "morgan": "1.9.0",
+    "node-gcm": "^0.14.10",
     "node-persist": "^2.1.0",
     "pusher-chatkit-server": "^0.11.2",
     "request": "^2.83.0",
@@ -24,9 +27,11 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "prod:build": "rimraf lib && babel *.js -d lib --ignore .test.js && cp -r config.json ./lib",
     "prod:start": "node lib/server.js",
+    "prod:start-push": "node lib/index.js",
     "start": "yarn prod:build && yarn prod:start",
+    "start-push": "yarn prod:build && yarn prod:start-push",
     "dev:start": "nodemon --ignore lib --exec babel-node server.js",
-    "dev:start-server": "nodemon --ignore lib --exec babel-node server.js"
+    "dev:start-push": "nodemon --ignore lib --exec babel-node index.js"
   },
   "devDependencies": {
     "eslint": "^4.19.1",
