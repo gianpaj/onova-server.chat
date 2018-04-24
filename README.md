@@ -40,7 +40,16 @@ ckInst
   });
 
 ckInst
-  .getUserRooms({ userId: "5ad9040a3da9c82c7389acee" })
+  .getUserRooms({ userId: "5ac5ebcd939b7f1712b92baf" })
+  .then(res => console.log(res))
+  .catch(e => console.log(e));
+
+ckInst
+  .updateUser({
+    id: "5ac5ebcd939b7f1712b92baf",
+    avatarURL:
+      "http://assets.onova.co/users/5ac5ebcd939b7f1712b92baf-1522921871772.jpg"
+  })
   .then(res => console.log(res))
   .catch(e => console.log(e));
 
@@ -50,7 +59,7 @@ ckInst
   .catch(e => console.log(e));
 
 ckInst
-  .getRoomMessages({ userId: "5ac5ebcd939b7f1712b92baf", roomId: 6718789 })
+  .getRoomMessages({ userId: "5ac5ebcd939b7f1712b92baf", roomId: 6899881 })
   .then(res => console.log(res))
   .catch(e => console.log(e));
 
