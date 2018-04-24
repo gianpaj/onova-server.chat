@@ -68,6 +68,7 @@ export class PushHelper {
     text = text.replace(/[\s|\n|\r]{1,}/g, ' ');
 
     return {
+      id: rooms[0].messages[0].id,
       title,
       message: text,
       user_id: parseInt(user.id, 10),
@@ -98,6 +99,8 @@ export class PushHelper {
         };
 
         const job = agenda.create(JOBNAMES.PUSH_MSG, pushData);
+
+        job.unique({ notification_id: notification.id });
 
         return job.save(err => {
           if (err) {
