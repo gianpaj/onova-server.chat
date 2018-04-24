@@ -43,8 +43,8 @@ export class PushHelper {
     let title = null;
     let roomIds = rooms.map(room => room.id);
 
-    const partner = users.find(u => u.id == rooms[0].messages[0].user_id);
-    debugger;
+    const partner = users.find(u => u.id !== rooms[0].messages[0].user_id);
+    // debugger;
     if (unreadMessagesCount === 1) {
       title = 'New message';
       text = partner.name + ': ' + rooms[0].messages[0].text;
