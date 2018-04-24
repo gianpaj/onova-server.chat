@@ -30,9 +30,9 @@ Rx.Observable.merge(
   })
   .flatMap(users => ckHelper.populateUsersWithCursors(users))
   .map(users => ckHelper.filterUsersRoomsAndMessages(users))
-  .do(users =>
-    console.log('Should send push messages to ' + users.length + ' users')
-  )
+//  .do(users =>
+//    console.log('Should send push messages to ' + users.length + ' users')
+//  )
   .filter(users => {
 //    if (users.length === 0) {
 //      console.timeEnd('timer');
