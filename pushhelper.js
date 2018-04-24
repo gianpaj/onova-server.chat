@@ -47,7 +47,7 @@ export class PushHelper {
     // debugger;
     if (unreadMessagesCount === 1) {
       title = 'New message';
-      text = partner.name + ': ' + rooms[0].messages[0].text;
+      text = rooms[0].messages[0].text;
       // } else if (rooms.length === 1) {
       //   title = 'Unread messages';
       //   text =
@@ -91,7 +91,7 @@ export class PushHelper {
         const { title, message, partner } = notification;
         const pushData = {
           message,
-          title,
+          // title,
           // triggeredBy: sender._id,
           triggeredType: 'User',
           senderName: partner.name,
