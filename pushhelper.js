@@ -84,9 +84,9 @@ export class PushHelper {
       this.getNotificationUsers(user, users)
     );
 
-    console.log('sendPushToUsers');
+    //console.log('sendPushToUsers');
     const Promises = notifications.map(notification => {
-      console.log(notification);
+      //console.log(notification);
       return new Promise((resolve, reject) => {
         const { title, message, partner } = notification;
         const pushData = {
@@ -208,7 +208,6 @@ export class PushHelper {
    * @returns {Observable<Token>}
    */
   issueNewToken() {
-    console.log('issueNewToken called');
     return Rx.Observable.fromPromise(
       new Promise((resolve, reject) => {
         request(

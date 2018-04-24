@@ -18,11 +18,11 @@ Rx.Observable.merge(
   Rx.Observable.interval(config.pollingInterval * 1000),
   Rx.Observable.of(null)
 )
-  .do(() => console.log('Launching new job'))
-  .do(() => console.time('timer'))
+//  .do(() => console.log('Launching new job'))
+//  .do(() => console.time('timer'))
   .flatMap(() => ckHelper.getUsers())
   .flatMap(users => {
-    console.log(`Searching messages of ${users.length} users`);
+    //console.log(`Searching messages of ${users.length} users`);
     return ckHelper.populateUsersWithRoomsAndMessages(
       users,
       config.messagesToLoad
@@ -34,13 +34,13 @@ Rx.Observable.merge(
     console.log('Should send push messages to ' + users.length + ' users')
   )
   .filter(users => {
-    if (users.length === 0) {
-      console.timeEnd('timer');
-    }
+//    if (users.length === 0) {
+//      console.timeEnd('timer');
+//    }
 
     return users.length > 0;
   })
   .flatMap(users => pushHelper.sendPushToUsers(users))
   .do(() => console.log('Completed sending push messages'))
-  .do(() => console.timeEnd('timer'))
+//  .do(() => console.timeEnd('timer'))
   .subscribe();
