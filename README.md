@@ -40,7 +40,7 @@ ckInst
   });
 
 ckInst
-  .getUserRooms({ userId: "5ac5ebcd939b7f1712b92baf" })
+  .getUserRooms({ userId: "5ae041ae953aa0350cface75" })
   .then(res => console.log(res))
   .catch(e => console.log(e));
 
@@ -50,11 +50,6 @@ ckInst
     avatarURL:
       "http://assets.onova.co/users/5ac5ebcd939b7f1712b92baf-1522921871772.jpg"
   })
-  .then(res => console.log(res))
-  .catch(e => console.log(e));
-
-ckInst
-  .getUsers()
   .then(res => console.log(res))
   .catch(e => console.log(e));
 
