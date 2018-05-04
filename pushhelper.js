@@ -93,11 +93,10 @@ export class PushHelper {
         const pushData = {
           message,
           // title,
-          // triggeredBy: sender._id,
-          triggeredType: 'User',
+          triggeredBy: roomId,
+          triggeredType: 'Room',
           senderName: partner.name,
           targetUser: partner.id,
-          roomId,
         };
 
         const job = agenda.create(JOBNAMES.PUSH_MSG, pushData);
