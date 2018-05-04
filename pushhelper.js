@@ -41,25 +41,25 @@ export class PushHelper {
 
     let text = null;
     let title = null;
-    let roomIds = rooms.map(room => room.id);
+    // let roomIds = rooms.map(room => room.id);
 
     const partner = users.find(u => u.id !== rooms[0].messages[0].user_id);
     // debugger;
-    if (unreadMessagesCount === 1) {
-      title = 'New message';
-      text = rooms[0].messages[0].text;
-      // } else if (rooms.length === 1) {
-      //   title = 'Unread messages';
-      //   text =
-      //     rooms[0].name +
-      //     ': ' +
-      //     'You have ' +
-      //     unreadMessagesCount +
-      //     ' unread messages';
-    } else {
-      title = 'Unread messages';
-      text = 'You have ' + unreadMessagesCount + ' unread messages';
-    }
+    // if (unreadMessagesCount === 1) {
+    title = 'New message';
+    text = rooms[0].messages[0].text;
+    // } else if (rooms.length === 1) {
+    //   title = 'Unread messages';
+    //   text =
+    //     rooms[0].name +
+    //     ': ' +
+    //     'You have ' +
+    //     unreadMessagesCount +
+    //     ' unread messages';
+    // } else {
+    //   title = 'Unread messages';
+    //   text = 'You have ' + unreadMessagesCount + ' unread messages';
+    // }
 
     rooms.forEach(room => {
       setItemSync(user.id + ':' + room.id, room.messages[0].id);
@@ -72,7 +72,8 @@ export class PushHelper {
       title,
       message: text,
       user_id: parseInt(user.id, 10),
-      rooms: roomIds,
+      // rooms: roomIds,
+      roomId: rooms[0].id,
       partner,
     };
   }
@@ -88,7 +89,7 @@ export class PushHelper {
     const Promises = notifications.map(notification => {
       //console.log(notification);
       return new Promise((resolve, reject) => {
-        const { title, message, partner } = notification;
+        const { title, message, partner, roomId } = notification;
         const pushData = {
           message,
           // title,
@@ -96,6 +97,7 @@ export class PushHelper {
           triggeredType: 'User',
           senderName: partner.name,
           targetUser: partner.id,
+          roomId,
         };
 
         const job = agenda.create(JOBNAMES.PUSH_MSG, pushData);
