@@ -119,11 +119,11 @@ export class ChatkitHelper {
   filterUsersRoomsAndMessages(users) {
     return users
       .map(user => {
-        // Remove rooms that doesn't have any unread messages
+        // Remove rooms that don't have any unread messages
         user.rooms = user.rooms
           .map(room => {
             room.messages = room.messages
-              .filter(message => message.id > (user.cursors[room.id] || 0)) // Filter out messages that's unread
+              .filter(message => message.id > (user.cursors[room.id] || 0)) // Filter out messages that are read
               .filter(
                 message =>
                   message.id >
@@ -136,8 +136,6 @@ export class ChatkitHelper {
 
         return user;
       })
-      .filter(user => {
-        return user.rooms.length > 0;
-      });
+      .filter(user => user.rooms.length > 0);
   }
 }
