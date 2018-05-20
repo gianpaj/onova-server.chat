@@ -41,13 +41,14 @@ export class PushHelper {
 
     let text = null;
     let title = null;
+    const message = rooms[0].messages[0];
     // let roomIds = rooms.map(room => room.id);
 
-    const partner = users.find(u => u.id !== rooms[0].messages[0].user_id);
-    // debugger;
+    const sender = users.find(u => u.id === message.user_id);
+
     // if (unreadMessagesCount === 1) {
     title = 'New message';
-    text = rooms[0].messages[0].text;
+    text = message.text;
     // } else if (rooms.length === 1) {
     //   title = 'Unread messages';
     //   text =
@@ -68,13 +69,13 @@ export class PushHelper {
     text = text.replace(/[\s|\n|\r]{1,}/g, ' ');
 
     return {
-      id: rooms[0].messages[0].id,
+      id: message.id,
       title,
       message: text,
       user_id: parseInt(user.id, 10),
       // rooms: roomIds,
       roomId: rooms[0].id,
-      partner,
+      sender,
     };
   }
 
@@ -89,14 +90,14 @@ export class PushHelper {
     const Promises = notifications.map(notification => {
       //console.log(notification);
       return new Promise((resolve, reject) => {
-        const { title, message, partner, roomId } = notification;
+        const { title, message, sender, roomId } = notification;
         const pushData = {
           message,
           // title,
           triggeredBy: roomId,
           triggeredType: 'Room',
-          senderName: partner.name,
-          targetUser: partner.id,
+          senderName: sender.name,
+          targetUser: sender.id,
         };
 
         const job = agenda.create(JOBNAMES.PUSH_MSG, pushData);
