@@ -44,7 +44,7 @@ export class PushHelper {
     const message = rooms[0].messages[0];
     // let roomIds = rooms.map(room => room.id);
 
-    const sender = users.find(u => u.id === message.user_id);
+    const partner = users.find(u => u.id !== message.user_id);
 
     // if (unreadMessagesCount === 1) {
     title = 'New message';
@@ -75,7 +75,7 @@ export class PushHelper {
       user_id: parseInt(user.id, 10),
       // rooms: roomIds,
       roomId: rooms[0].id,
-      sender,
+      partner,
     };
   }
 
@@ -90,14 +90,14 @@ export class PushHelper {
     const Promises = notifications.map(notification => {
       //console.log(notification);
       return new Promise((resolve, reject) => {
-        const { title, message, sender, roomId } = notification;
+        const { title, message, partner, roomId } = notification;
         const pushData = {
           message,
           // title,
           triggeredBy: roomId,
           triggeredType: 'Room',
-          senderName: sender.name,
-          targetUser: sender.id,
+          // senderName: partner.name,
+          targetUser: partner.id,
         };
 
         const job = agenda.create(JOBNAMES.PUSH_MSG, pushData);
