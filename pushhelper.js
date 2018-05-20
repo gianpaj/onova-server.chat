@@ -72,10 +72,11 @@ export class PushHelper {
       id: message.id,
       title,
       message: text,
-      user_id: parseInt(user.id, 10),
+      // user_id: parseInt(user.id, 10),
       // rooms: roomIds,
       roomId: rooms[0].id,
       partner,
+      senderId: message.user_id,
     };
   }
 
@@ -90,7 +91,7 @@ export class PushHelper {
     const Promises = notifications.map(notification => {
       //console.log(notification);
       return new Promise((resolve, reject) => {
-        const { title, message, partner, roomId } = notification;
+        const { title, message, partner, roomId, senderId } = notification;
         const pushData = {
           message,
           // title,
@@ -98,6 +99,7 @@ export class PushHelper {
           triggeredType: 'Room',
           // senderName: partner.name,
           targetUser: partner.id,
+          senderId,
         };
 
         const job = agenda.create(JOBNAMES.PUSH_MSG, pushData);
