@@ -35,16 +35,17 @@ export class PushHelper {
       return room;
     });
 
-    const unreadMessagesCount = rooms.reduce((unreadMessagesCarry, room) => {
-      return unreadMessagesCarry + room.messages.length;
-    }, 0);
+    // const unreadMessagesCount = rooms.reduce((unreadMessagesCarry, room) => {
+    //   return unreadMessagesCarry + room.messages.length;
+    // }, 0);
 
     let text = null;
     let title = null;
     const message = rooms[0].messages[0];
     // let roomIds = rooms.map(room => room.id);
 
-    const partner = users.find(u => u.id !== message.user_id);
+    // const partner = users.find(u => u.id !== message.user_id);
+    const partner = rooms[0].member_user_ids.find(u => u !== message.user_id);
 
     // if (unreadMessagesCount === 1) {
     title = 'New message';
@@ -98,7 +99,7 @@ export class PushHelper {
           triggeredBy: roomId,
           triggeredType: 'Room',
           // senderName: partner.name,
-          targetUser: partner.id,
+          targetUser: partner,
           senderId,
         };
 

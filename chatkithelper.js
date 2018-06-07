@@ -123,7 +123,7 @@ export class ChatkitHelper {
         user.rooms = user.rooms
           .map(room => {
             room.messages = room.messages
-              .filter(message => message.id > (user.cursors[room.id] || 0)) // Filter out messages that are read
+              // .filter(message => message.id > (user.cursors[room.id] || 0)) // Filter out messages that are read
               .filter(
                 message =>
                   message.id >
