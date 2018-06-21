@@ -48,8 +48,12 @@ export class PushHelper {
     const partner = rooms[0].member_user_ids.find(u => u !== message.user_id);
 
     // if (unreadMessagesCount === 1) {
-    title = 'New message';
+    // title = 'New message';
     text = message.text;
+
+    if (message.attachment) {
+      text = 'Photo';
+    }
     // } else if (rooms.length === 1) {
     //   title = 'Unread messages';
     //   text =
@@ -71,7 +75,7 @@ export class PushHelper {
 
     return {
       id: message.id,
-      title,
+      // title,
       message: text,
       // user_id: parseInt(user.id, 10),
       // rooms: roomIds,
@@ -92,7 +96,13 @@ export class PushHelper {
     const Promises = notifications.map(notification => {
       //console.log(notification);
       return new Promise((resolve, reject) => {
-        const { title, message, partner, roomId, senderId } = notification;
+        const {
+          // title,
+          message,
+          partner,
+          roomId,
+          senderId,
+        } = notification;
         const pushData = {
           message,
           // title,

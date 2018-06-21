@@ -2,7 +2,7 @@
 
 https://github.com/gildebrand/chatkit-push-helper
 
-## helpful stuff
+## helpful code snippets
 
 ```js
 const Chatkit = require("pusher-chatkit-server");
