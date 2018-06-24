@@ -78,13 +78,6 @@
     lodash "^4.2.0"
     to-fast-properties "^2.0.0"
 
-"@pusher/chatkit-server@^0.12.1":
-  version "0.12.1"
-  resolved "https://registry.yarnpkg.com/@pusher/chatkit-server/-/chatkit-server-0.12.1.tgz#c4a35ac45da7e04a2034ce04c47630a6062c5e73"
-  dependencies:
-    jsonwebtoken "^8.2.0"
-    pusher-platform-node "~0.13.0"
-
 abbrev@1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.1.1.tgz#f8f2c887ad10bf67f634f005b6987fed3179aac8"
@@ -3284,9 +3277,16 @@ punycode@^1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-1.4.1.tgz#c0d5a63b2718800ad8e1eb0fa5269c84dd41845e"
 
-pusher-platform-node@~0.13.0:
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/pusher-platform-node/-/pusher-platform-node-0.13.0.tgz#859e8c8ba1b04617f060ed261a12065ce7312085"
+pusher-chatkit-server@^0.11.2:
+  version "0.11.2"
+  resolved "https://registry.yarnpkg.com/pusher-chatkit-server/-/pusher-chatkit-server-0.11.2.tgz#9c0d569c7fb8cdcb6cb9dd1016a705d1b9698b57"
+  dependencies:
+    jsonwebtoken "^8.2.0"
+    pusher-platform-node "~0.12.1"
+
+pusher-platform-node@~0.12.1:
+  version "0.12.1"
+  resolved "https://registry.yarnpkg.com/pusher-platform-node/-/pusher-platform-node-0.12.1.tgz#2158822c2f6df7b4a196e6aeeebbfeb44d7ad0c1"
   dependencies:
     body-parser "^1.17.2"
     extend "^2.0.1"
