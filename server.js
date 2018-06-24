@@ -2,7 +2,7 @@
 
 import express from 'express';
 import bodyParser from 'body-parser';
-import Chatkit from '@pusher/chatkit-server';
+import Chatkit from 'pusher/chatkit-server';
 // import logger from 'morgan';
 
 const config = require('./config');
