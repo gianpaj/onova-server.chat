@@ -49,7 +49,7 @@ app.post(config.ENDPOINT, (req, res, next) => {
       authPayload: req.body,
     });
     console.log('authenticated', user_id);
-    return res.json(auth);
+    return res.json(auth.body);
   } catch (error) {
     return res.status(500).json({ ok: false, error });
   }
