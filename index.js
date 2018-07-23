@@ -1,4 +1,4 @@
-import Chatkit from 'pusher-chatkit-server';
+import Chatkit from '@pusher/chatkit-server';
 import Rx from 'rxjs/Rx';
 
 import { ChatkitHelper } from './chatkithelper';

@@ -8,20 +8,19 @@ const {
   APP_KEY,
   APP_SECRET,
   CLUSTER,
-  PORT,
   DEBUG,
   MONGO_URI,
+  PORT,
 } = process.env;
-const ENDPOINT = process.env.ENDPOINT || DEFAULT_ENDPOINT;
 const config = {
   APP_ID,
   APP_KEY,
   APP_SECRET,
   CLUSTER,
-  PORT,
   DEBUG,
-  ENDPOINT,
+  ENDPOINT: process.env.ENDPOINT || DEFAULT_ENDPOINT,
   MONGO_URI,
+  PORT,
 };
 
 const requiredKeys = [
@@ -30,6 +29,7 @@ const requiredKeys = [
   'APP_SECRET',
   'CLUSTER',
   'MONGO_URI',
+  'ENDPOINT',
 ];
 requiredKeys.forEach(key => {
   if (!config[key]) throw new Error(getMissingKeyErrorString(key));

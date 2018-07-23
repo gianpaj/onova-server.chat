@@ -2,7 +2,7 @@
 
 import express from 'express';
 import bodyParser from 'body-parser';
-import Chatkit from 'pusher-chatkit-server';
+import Chatkit from '@pusher/chatkit-server';
 // import logger from 'morgan';
 
 const config = require('./config');
@@ -16,9 +16,7 @@ const chatkit = new Chatkit({
 });
 
 const debug = (...args) => {
-  if (config.DEBUG) {
-    console.log('debug::: ', ...args);
-  }
+  if (config.DEBUG) console.log('debug::: ', ...args);
 };
 
 // Allow CORS
@@ -35,9 +33,6 @@ app.post(config.ENDPOINT, (req, res, next) => {
   debug('req.body:', req.body);
   // Some logic to determine whether the user making the request has access to
   // the private channel
-  // ...
-  // ...
-  // ...
   // TODO: validate JWT token
 
   const { grant_type } = req.body;
@@ -88,7 +83,7 @@ app.post(config.ENDPOINT, (req, res, next) => {
 });
 
 app.listen(port, () => {
-  let msg = '';
+  let msg;
   if (config.DEBUG) msg = '(DEBUG mode)';
-  console.info(`server started on port ${port} ${msg}`);
+  console.info('server started on port:', port, msg);
 });

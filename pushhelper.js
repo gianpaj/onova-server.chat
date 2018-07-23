@@ -1,7 +1,7 @@
 import Rx from 'rxjs/Rx';
 import request from 'request';
 import Agenda from 'agenda';
-import { initSync, setItemSync, getItemSync } from 'node-persist';
+import { init, setItem, getItem } from 'node-persist';
 
 const config = require('./config');
 
@@ -21,7 +21,7 @@ const agenda = new Agenda({
 
 export class PushHelper {
   constructor() {
-    initSync();
+    init().then(() => console.log('node-persist initiated'));
   }
 
   getNotificationUsers(user, users) {
@@ -68,7 +68,7 @@ export class PushHelper {
     // }
 
     rooms.forEach(room => {
-      setItemSync(user.id + ':' + room.id, room.messages[0].id);
+      setItem(user.id + ':' + room.id, room.messages[0].id);
     });
 
     text = text.replace(/[\s|\n|\r]{1,}/g, ' ');
@@ -85,8 +85,8 @@ export class PushHelper {
     };
   }
 
-  sendPushToUsers(users) {
-    initSync();
+  async sendPushToUsers(users) {
+    await init();
 
     let notifications = users.map(user =>
       this.getNotificationUsers(user, users)
@@ -249,8 +249,8 @@ export class PushHelper {
     ).do(token => (this.token = token));
   }
 
-  getLastPushedMessage(userId, roomId) {
-    return getItemSync(userId + ':' + roomId) || 0;
+  async getLastPushedMessage(userId, roomId) {
+    return (await getItem(userId + ':' + roomId)) || 0;
   }
 }
 

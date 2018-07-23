@@ -1,13 +1,18 @@
-# chatkit-push-helper
+# Pusher Auth REST API and Push notification polling for ChatKit
 
+`index.js` inspired from
 https://github.com/gildebrand/chatkit-push-helper
 
 ## helpful code snippets
 
-```js
-const Chatkit = require("pusher-chatkit-server");
+From the command line on this folder:
 
-const config = require("./config.json");
+    node -r esm
+
+```js
+const Chatkit = require('@pusher/chatkit-server');
+
+const config = require('./config.json');
 
 const ckInst = new Chatkit.default({
   instanceLocator: config.chatkit.instanceLocator,
@@ -18,26 +23,28 @@ ckInst
   .updatePermissionsForGlobalRole({
     roleName: "default",
     permissionsToAdd: [
-      "message:create",
-      "room:join",
-      "room:get",
-      "room:create",
-      "room:messages:get",
-      "room:typing_indicator:create",
-      "presence:subscribe",
-      "user:get",
-      "user:rooms:get",
       "cursors:read:get",
       "cursors:read:set",
       "file:create",
       "file:get",
+      "message:create",
+      "presence:subscribe",
+      "room:create",
       "room:delete",
+      "room:get",
+      "room:join",
+      "room:messages:get",
+      "room:typing_indicator:create",
       "room:update"
+      "user:get",
+      "user:rooms:get",
     ]
   })
   .then(() => {
     console.log("updatePermissionsForGlobalRole Success");
   });
+
+ckInst.getRoles().then(res => console.log(res)).catch(e => console.log(e));
 
 ckInst
   .getUserRooms({ userId: "5ae041ae953aa0350cface75" })
