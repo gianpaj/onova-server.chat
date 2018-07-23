@@ -37,48 +37,21 @@ app.post(config.ENDPOINT, (req, res, next) => {
 
   const { grant_type } = req.body;
 
-  if (grant_type == 'client_credentials') {
-    const { token, avatarURL, username } = req.headers;
-
+  try {
+    if (grant_type !== 'client_credentials') {
+      throw new Error('Invalid request');
+    }
+    // const { token, avatarURL, username } = req.headers;
     const { user_id } = req.query;
+
     const auth = chatkit.authenticate({
       userId: user_id,
       authPayload: req.body,
     });
-    return chatkit
-      .updatePermissionsForGlobalRole({
-        roleName: 'default',
-        permissionsToAdd: [
-          'message:create',
-          'room:join',
-          // 'room:leave',
-          'room:get',
-          'room:create',
-          'room:messages:get',
-          'room:typing_indicator:create',
-          'presence:subscribe',
-          'user:get',
-          'user:rooms:get',
-          'cursors:read:get',
-          'cursors:read:set',
-          'file:create',
-          'file:get',
-          'room:delete',
-          'room:update',
-        ],
-      })
-      .then(() => {
-        console.log('updatePermissionsForGlobalRole Success');
-        return res.json(auth);
-      })
-      .catch(e => {
-        res.status(500).json({
-          ok: false,
-          error: e,
-        });
-      });
-  } else {
-    res.status(500);
+    console.log('authenticated', user_id);
+    return res.json(auth);
+  } catch (error) {
+    return res.status(500).json({ ok: false, error });
   }
 });
 
