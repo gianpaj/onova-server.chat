@@ -25,5 +25,5 @@ pipelines:
                 git fetch &&
                 git reset --hard origin/master &&
                 yarn &&
-                pm2 restart server.chat-push --silent --no-color;
+                pm2 restart server.chat-push server.chat-push --silent --no-color;
               EOF
