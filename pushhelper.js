@@ -1,3 +1,5 @@
+// @flow
+
 import Rx from 'rxjs/Rx';
 import request from 'request';
 import Agenda from 'agenda';
@@ -67,8 +69,12 @@ export class PushHelper {
     //   text = 'You have ' + unreadMessagesCount + ' unread messages';
     // }
 
-    rooms.forEach(room => {
-      setItem(user.id + ':' + room.id, room.messages[0].id);
+    rooms.forEach(async room => {
+      try {
+        await setItem(user.id + ':' + room.id, room.messages[0].id);
+      } catch (error) {
+        console.error(error);
+      }
     });
 
     text = text.replace(/[\s|\n|\r]{1,}/g, ' ');
@@ -85,8 +91,8 @@ export class PushHelper {
     };
   }
 
-  async sendPushToUsers(users) {
-    await init();
+  sendPushToUsers(users) {
+    // await init();
 
     let notifications = users.map(user =>
       this.getNotificationUsers(user, users)
@@ -249,8 +255,8 @@ export class PushHelper {
     ).do(token => (this.token = token));
   }
 
-  async getLastPushedMessage(userId, roomId) {
-    return (await getItem(userId + ':' + roomId)) || 0;
+  getLastPushedMessage(userId, roomId): Promise<any> {
+    return getItem(userId + ':' + roomId);
   }
 }
 

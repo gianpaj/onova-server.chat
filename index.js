@@ -22,7 +22,7 @@ Rx.Observable.merge(
   // .do(() => console.time('timer'))
   .flatMap(() => ckHelper.getUsers())
   .flatMap(users => {
-    //console.log(`Searching messages of ${users.length} users`);
+    // console.log(`Searching messages of ${users.length} users`);
     return ckHelper.populateUsersWithRoomsAndMessages(
       users,
       config.messagesToLoad
