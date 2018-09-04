@@ -3,14 +3,14 @@
   "version": "1.0.0",
   "description": "Pusher Auth REST API and Push notification polling for ChatKit",
   "dependencies": {
+    "@babel/cli": "^7.0.0",
+    "@babel/core": "^7.0.0",
+    "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
+    "@babel/preset-flow": "^7.0.0",
     "@pusher/chatkit-server": "^0.12.2",
     "agenda": "^1.0.3",
-    "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.0",
     "babel-eslint": "^8.2.3",
-    "babel-plugin-transform-object-rest-spread": "6.26.0",
-    "babel-preset-env": "^1.6.1",
-    "babel-preset-flow": "^6.23.0",
     "body-parser": "^1.18.2",
     "dotenv": "^6.0.0",
     "esm": "^3.0.20",
@@ -33,6 +33,7 @@
     "dev:start-push": "nodemon --ignore lib --exec babel-node index.js"
   },
   "devDependencies": {
+    "@babel/node": "^7.0.0",
     "eslint": "^5.2.0",
     "eslint-config-prettier": "2.9.0",
     "eslint-plugin-flowtype": "^2.46.2",
