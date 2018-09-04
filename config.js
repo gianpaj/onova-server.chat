@@ -3,34 +3,15 @@ require('dotenv').config();
 
 const DEFAULT_ENDPOINT = '/pusher/auth';
 
-const {
-  APP_ID,
-  APP_KEY,
-  APP_SECRET,
-  CLUSTER,
-  DEBUG,
-  MONGO_URI,
-  PORT,
-} = process.env;
+const { DEBUG, MONGO_URI, PORT } = process.env;
 const config = {
-  APP_ID,
-  APP_KEY,
-  APP_SECRET,
-  CLUSTER,
   DEBUG,
   ENDPOINT: process.env.ENDPOINT || DEFAULT_ENDPOINT,
   MONGO_URI,
   PORT,
 };
 
-const requiredKeys = [
-  'APP_ID',
-  'APP_KEY',
-  'APP_SECRET',
-  'CLUSTER',
-  'MONGO_URI',
-  'ENDPOINT',
-];
+const requiredKeys = ['MONGO_URI', 'ENDPOINT'];
 requiredKeys.forEach(key => {
   if (!config[key]) throw new Error(getMissingKeyErrorString(key));
 });
