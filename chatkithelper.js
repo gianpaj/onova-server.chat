@@ -125,12 +125,9 @@ export class ChatkitHelper {
             room.messages = room.messages
               // .filter(message => message.id > (user.cursors[room.id] || 0)) // Filter out messages that are read
               .filter(
-                async message =>
+                message =>
                   message.id >
-                  ((await this.pushHelperInstance.getLastPushedMessage(
-                    user.id,
-                    room.id
-                  )) || 0)
+                  this.pushHelperInstance.getLastPushedMessage(user.id, room.id)
               );
 
             return room;

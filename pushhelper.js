@@ -3,7 +3,7 @@
 import Rx from 'rxjs/Rx';
 import request from 'request';
 import Agenda from 'agenda';
-import { init, setItem, getItem } from 'node-persist';
+const storage = require('node-persist');
 
 const config = require('./config');
 
@@ -23,10 +23,11 @@ const agenda = new Agenda({
 
 export class PushHelper {
   constructor() {
-    init().then(() => console.log('node-persist initiated'));
+    storage.initSync();
+    console.log('node-persist initiated');
   }
 
-  getNotificationUsers(user, users) {
+  getNotificationUsers(user) {
     const rooms = user.rooms.map(room => {
       room.messages
         .filter(
@@ -42,8 +43,9 @@ export class PushHelper {
     // }, 0);
 
     let text = null;
-    let title = null;
+    // let title = null;
     const message = rooms[0].messages[0];
+
     // let roomIds = rooms.map(room => room.id);
 
     // const partner = users.find(u => u.id !== message.user_id);
@@ -69,12 +71,8 @@ export class PushHelper {
     //   text = 'You have ' + unreadMessagesCount + ' unread messages';
     // }
 
-    rooms.forEach(async room => {
-      try {
-        await setItem(user.id + ':' + room.id, room.messages[0].id);
-      } catch (error) {
-        console.error(error);
-      }
+    rooms.forEach(room => {
+      storage.setItemSync(user.id + ':' + room.id, room.messages[0].id);
     });
 
     text = text.replace(/[\s|\n|\r]{1,}/g, ' ');
@@ -82,6 +80,7 @@ export class PushHelper {
     return {
       id: message.id,
       // title,
+      created_at: message.created_at,
       message: text,
       // user_id: parseInt(user.id, 10),
       // rooms: roomIds,
@@ -92,18 +91,15 @@ export class PushHelper {
   }
 
   sendPushToUsers(users) {
-    // await init();
+    storage.initSync();
 
-    let notifications = users.map(user =>
-      this.getNotificationUsers(user, users)
-    );
+    let notifications = users.map(user => this.getNotificationUsers(user));
 
-    //console.log('sendPushToUsers');
     const Promises = notifications.map(notification => {
-      //console.log(notification);
       return new Promise((resolve, reject) => {
         const {
           // title,
+          created_at,
           message,
           partner,
           roomId,
@@ -119,9 +115,11 @@ export class PushHelper {
           senderId,
         };
 
+        config.DEBUG && console.log(pushData);
+
         const job = agenda.create(JOBNAMES.PUSH_MSG, pushData);
 
-        job.unique({ notification_id: notification.id });
+        job.unique({ created_at });
 
         return job.save(err => {
           if (err) {
@@ -135,7 +133,7 @@ export class PushHelper {
     return Rx.Observable.of(Promise.all(Promises)).flatMap(() =>
       Rx.Observable.fromPromise(
         new Promise((resolve, reject) => {
-          return resolve();
+          return resolve(Promises.length);
         })
       )
     );
@@ -256,7 +254,7 @@ export class PushHelper {
   }
 
   getLastPushedMessage(userId, roomId): Promise<any> {
-    return getItem(userId + ':' + roomId);
+    return storage.getItemSync(userId + ':' + roomId) || 0;
   }
 }
 
