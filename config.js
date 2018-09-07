@@ -1,12 +1,10 @@
 // require and configure dotenv, will load vars in .env file in process.env
 require('dotenv').config();
 
-const DEFAULT_ENDPOINT = '/pusher/auth';
-
-const { DEBUG, MONGO_URI, PORT } = process.env;
+const { DEBUG, MONGO_URI, PORT, ENDPOINT } = process.env;
 const config = {
   DEBUG,
-  ENDPOINT: process.env.ENDPOINT || DEFAULT_ENDPOINT,
+  ENDPOINT: ENDPOINT || '/pusher/auth',
   MONGO_URI,
   PORT,
 };
