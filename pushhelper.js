@@ -127,6 +127,7 @@ export class PushHelper {
             const e = new Error(`Job failed with error: ${err}`);
             reject(e);
           }
+          resolve();
         });
       });
     });
