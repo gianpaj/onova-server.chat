@@ -45,6 +45,6 @@ Rx.Observable.merge(
     return users.length > 0;
   })
   .flatMap(users => pushHelper.sendPushToUsers(users))
-  .do(x => console.log(`Completed sending ${x} push messages`))
+  .do(x => console.log(`Completed scheduling ${x} push messages`))
   // .do(() => console.timeEnd('timer'))
   .subscribe();

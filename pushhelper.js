@@ -107,6 +107,7 @@ export class PushHelper {
         } = notification;
         const pushData = {
           message,
+          created_at,
           // title,
           triggeredBy: roomId,
           triggeredType: 'Room',
