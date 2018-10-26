@@ -3,13 +3,10 @@
 import Rx from 'rxjs/Rx';
 import request from 'request';
 import Agenda from 'agenda';
+import Util, { JOBNAMES } from './util';
 const storage = require('node-persist');
 
 const config = require('./config');
-
-const JOBNAMES = {
-  PUSH_MSG: 'send-push-msg', // person to person
-};
 
 import { push } from './config.json';
 
