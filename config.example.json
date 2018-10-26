@@ -1,0 +1,8 @@
+{
+  "pollingInterval": 9,
+  "messagesToLoad": 5,
+  "chatkit": {
+    "instanceLocator": "",
+    "key": ""
+  }
+}
