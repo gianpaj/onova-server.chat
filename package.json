@@ -1,5 +1,5 @@
 {
-  "name": "onova.server.push",
+  "name": "onova.server.chat",
   "version": "1.0.0",
   "description": "Pusher Auth REST API and Push notification polling for ChatKit",
   "dependencies": {
@@ -50,7 +50,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://bitbucket.org/onova/server.push.git"
+    "url": "https://bitbucket.org/onova/server.chat.git"
   },
   "private": true,
   "author": "Onova Team <hello@onova.co>",
