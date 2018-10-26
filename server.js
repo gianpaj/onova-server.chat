@@ -4,8 +4,19 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import Chatkit from '@pusher/chatkit-server';
 // import logger from 'morgan';
+import Agenda from 'agenda';
+import Util, { JOBNAMES } from './util';
 
 const config = require('./config');
+const ONOVA_BOT_ID = '5bd1f7af46c62e6cdee546d0';
+
+const agenda = new Agenda({
+  db: {
+    address: config.MONGO_URI,
+    maxConcurrency: 2,
+    defaultLockLifetime: 5000, // seconds
+  },
+});
 
 const app = express();
 const port = process.env.PORT || 8142;
@@ -60,3 +71,79 @@ app.listen(port, () => {
   if (config.DEBUG) msg = '(DEBUG mode)';
   console.info('server started on port:', port, msg);
 });
+
+agenda.on('complete', job => {
+  debug(job.attrs.data);
+  debug(`Job ${job.attrs.name} finished`);
+});
+
+agenda.on('fail', (err, job) => {
+  console.error(`Job failed with error: ${err.message}`);
+
+  console.error(job);
+});
+
+agenda.on('ready', () => {
+  agenda.start();
+});
+
+agenda.on('error', () => {
+  agenda.start();
+});
+
+// listen to SYSTEM_MSG jobs
+agenda.define(JOBNAMES.SYSTEM_MSG, async (job: Agenda.Job<any>, done) => {
+  const {
+    data: { order, message },
+  } = job.attrs;
+
+  try {
+    const sellerRooms = await chatkit.getUserRooms({
+      userId: order.seller,
+    });
+    const allRooms = sellerRooms.filter(r => r.name == getRoomName(order));
+
+    if (allRooms.length !== 1) {
+      console.log(allRooms);
+      throw new Error('error getting user rooms');
+    }
+    const roomId = allRooms[0].id;
+    debug('adding onovabot to room id:', roomId);
+
+    // make one user of the two add onovabot to the chat room Id
+    await chatkit.apiRequest({
+      method: 'PUT',
+      path: `/rooms/${roomId}/users/add`,
+      body: {
+        user_ids: [ONOVA_BOT_ID],
+      },
+      jwt: chatkit.generateAccessToken({ userId: order.seller }).token,
+    });
+    debug('onovabot added successfully');
+
+    // send system message
+    await chatkit.apiRequest({
+      method: 'POST',
+      path: `/rooms/${roomId}/messages`,
+      body: {
+        text: message,
+      },
+      jwt: chatkit.generateAccessToken({ userId: ONOVA_BOT_ID }).token,
+    });
+
+    done();
+  } catch (error) {
+    console.error(error);
+    done(error);
+  }
+});
+
+function getRoomName(o: Order): string {
+  let ids;
+  if (o.buyer._id && o.seller._id) {
+    ids = [o.buyer._id, o.seller._id];
+  } else {
+    ids = [o.buyer, o.seller];
+  }
+  return ids.sort().join('-');
+}

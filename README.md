@@ -7,7 +7,7 @@ https://github.com/gildebrand/chatkit-push-helper
 
 From the command line on this folder:
 
-    node -r esm
+    node --inspect
 
 ```js
 const Chatkit = require('@pusher/chatkit-server');
@@ -77,4 +77,46 @@ temp1.forEach(u =>
     .then(res => console.log(res))
     .catch(e => console.log(e))
 );
+```
+
+### System messages
+
+Send message as @onovabot
+
+```js
+gianpaj = "5af9faca151df625830bbfe1";
+onovabot = "5bd1f7af46c62e6cdee546d0";
+roomId = 15069181;
+
+ckInst
+  .apiRequest({
+    method: "PUT",
+    path: `/rooms/${roomId}/users/add`,
+    body: {
+      user_ids: [onovabot]
+    },
+    jwt: ckInst.generateAccessToken({ userId: gianpaj }).token
+  })
+  .then(() => {
+    console.log("Success");
+  })
+  .catch(err => {
+    console.log(err);
+  });
+
+ckInst
+  .apiRequest({
+    method: "POST",
+    path: `/rooms/${roomId}/messages`,
+    body: {
+      text: "Hello from onova bot"
+    },
+    jwt: ckInst.generateAccessToken({ userId: onovabot }).token
+  })
+  .then(() => {
+    console.log("Success");
+  })
+  .catch(err => {
+    console.log(err);
+  });
 ```
