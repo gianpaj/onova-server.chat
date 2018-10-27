@@ -10,6 +10,8 @@ const config = require('./config');
 
 import { push } from './config.json';
 
+const ONOVA_BOT_ID = '5bd1f7af46c62e6cdee546d0';
+
 const agenda = new Agenda({
   db: {
     address: config.MONGO_URI,
@@ -39,18 +41,17 @@ export class PushHelper {
     //   return unreadMessagesCarry + room.messages.length;
     // }, 0);
 
-    let text = null;
     // let title = null;
     const message = rooms[0].messages[0];
 
     // let roomIds = rooms.map(room => room.id);
 
-    // const partner = users.find(u => u.id !== message.user_id);
-    const partner = rooms[0].member_user_ids.find(u => u !== message.user_id);
+    // const receiver = users.find(u => u.id !== message.user_id);
+    // const receiver = rooms[0].member_user_ids.find(u => u !== message.user_id);
 
     // if (unreadMessagesCount === 1) {
     // title = 'New message';
-    text = message.text;
+    let text = message.text;
 
     if (message.attachment) {
       text = 'Photo';
@@ -82,7 +83,7 @@ export class PushHelper {
       // user_id: parseInt(user.id, 10),
       // rooms: roomIds,
       roomId: rooms[0].id,
-      partner,
+      receiver: user.id,
       senderId: message.user_id,
     };
   }
@@ -90,7 +91,9 @@ export class PushHelper {
   sendPushToUsers(users) {
     storage.initSync();
 
-    let notifications = users.map(user => this.getNotificationUsers(user));
+    const notifications = users
+      .filter(u => u.id !== ONOVA_BOT_ID)
+      .map(user => this.getNotificationUsers(user));
 
     const Promises = notifications.map(notification => {
       return new Promise((resolve, reject) => {
@@ -98,7 +101,7 @@ export class PushHelper {
           // title,
           created_at,
           message,
-          partner,
+          receiver,
           roomId,
           senderId,
         } = notification;
@@ -108,8 +111,8 @@ export class PushHelper {
           // title,
           triggeredBy: roomId,
           triggeredType: 'Room',
-          // senderName: partner.name,
-          targetUser: partner,
+          // senderName: receiver.name,
+          targetUser: receiver,
           senderId,
         };
 
@@ -117,12 +120,12 @@ export class PushHelper {
 
         const job = agenda.create(JOBNAMES.PUSH_MSG, pushData);
 
-        job.unique({ created_at });
+        job.unique({ created_at, targetUser });
 
         return job.save(err => {
           if (err) {
             const e = new Error(`Job failed with error: ${err}`);
-            reject(e);
+            return reject(e);
           }
           resolve();
         });
