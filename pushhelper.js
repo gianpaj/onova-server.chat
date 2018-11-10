@@ -120,7 +120,7 @@ export class PushHelper {
 
         const job = agenda.create(JOBNAMES.PUSH_MSG, pushData);
 
-        job.unique({ created_at, targetUser });
+        job.unique({ created_at, targetUser: receiver });
 
         return job.save(err => {
           if (err) {
