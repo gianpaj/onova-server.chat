@@ -3,7 +3,7 @@
 import Rx from 'rxjs/Rx';
 import request from 'request';
 import Agenda from 'agenda';
-import Util, { JOBNAMES } from './util';
+import { JOBNAMES } from './util';
 const storage = require('node-persist');
 
 const config = require('./config');
@@ -95,42 +95,44 @@ export class PushHelper {
       .filter(u => u.id !== ONOVA_BOT_ID)
       .map(user => this.getNotificationUsers(user));
 
-    const Promises = notifications.map(notification => {
-      return new Promise((resolve, reject) => {
-        const {
-          // title,
-          created_at,
-          message,
-          receiver,
-          roomId,
-          senderId,
-        } = notification;
-        const pushData = {
-          message,
-          created_at,
-          // title,
-          triggeredBy: roomId,
-          triggeredType: 'Room',
-          // senderName: receiver.name,
-          targetUser: receiver,
-          senderId,
-        };
+    const Promises = notifications
+      .filter(notif => notif.receiver !== notif.senderId)
+      .map(notification => {
+        return new Promise((resolve, reject) => {
+          const {
+            // title,
+            created_at,
+            message,
+            receiver,
+            roomId,
+            senderId,
+          } = notification;
+          const pushData = {
+            message,
+            created_at,
+            // title,
+            triggeredBy: roomId,
+            triggeredType: 'Room',
+            // senderName: receiver.name,
+            targetUser: receiver,
+            senderId,
+          };
 
-        config.DEBUG && console.log(pushData);
+          config.DEBUG && console.log(pushData);
 
-        const job = agenda.create(JOBNAMES.PUSH_MSG, pushData);
+          const job = agenda.create(JOBNAMES.PUSH_MSG, pushData);
 
-        job.unique({ created_at, targetUser: receiver });
+          job.unique({ created_at, targetUser: receiver });
 
-        return job.save(err => {
-          if (err) {
-            const e = new Error(`Job failed with error: ${err}`);
-            return reject(e);
-          }
-          resolve();
+          return job.save(err => {
+            if (err) {
+              const e = new Error(`Job failed with error: ${err}`);
+              return reject(e);
+            }
+            resolve();
+          });
         });
       });
-    });
 
     return Rx.Observable.of(Promise.all(Promises)).flatMap(() =>
       Rx.Observable.fromPromise(
