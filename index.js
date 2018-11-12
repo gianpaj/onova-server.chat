@@ -8,6 +8,9 @@ import { PushHelper } from './pushhelper';
 const config = require('./config.json');
 const env = require('./config');
 
+if (env.DEBUG) console.log('Debugging is enabled');
+else console.log('Debugging is disabled');
+
 const ckInst = new Chatkit({
   instanceLocator: config.chatkit.instanceLocator,
   key: config.chatkit.key,

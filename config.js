@@ -3,7 +3,7 @@ require('dotenv').config();
 
 const { DEBUG, MONGO_URI, PORT, ENDPOINT } = process.env;
 const config = {
-  DEBUG,
+  DEBUG: DEBUG == 'true',
   ENDPOINT: ENDPOINT || '/pusher/auth',
   MONGO_URI,
   PORT,
