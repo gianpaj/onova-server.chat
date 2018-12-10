@@ -98,9 +98,7 @@ agenda.define(JOBNAMES.SYSTEM_MSG, async (job: Agenda.Job<any>, done) => {
   } = job.attrs;
 
   try {
-    const sellerRooms = await chatkit.getUserRooms({
-      userId: order.seller,
-    });
+    const sellerRooms = await chatkit.getUserRooms({ userId: order.seller });
     const allRooms = sellerRooms.filter(r => r.name == getRoomName(order));
 
     if (allRooms.length !== 1) {
