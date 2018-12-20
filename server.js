@@ -67,7 +67,7 @@ app.post(config.ENDPOINT, (req, res, next) => {
 });
 
 app.listen(port, () => {
-  let msg;
+  let msg = '';
   if (config.DEBUG) msg = '(DEBUG mode)';
   console.info('server started on port:', port, msg);
 });
@@ -98,6 +98,7 @@ agenda.define(JOBNAMES.SYSTEM_MSG, async (job: Agenda.Job<any>, done) => {
   } = job.attrs;
 
   try {
+    // the seller should have created the room already
     const sellerRooms = await chatkit.getUserRooms({ userId: order.seller });
     const allRooms = sellerRooms.filter(r => r.name == getRoomName(order));
 
