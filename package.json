@@ -37,6 +37,7 @@
     "eslint-plugin-flowtype": "^2.46.2",
     "eslint-plugin-import": "^2.14.0",
     "eslint-plugin-prettier": "^2.6.0",
+    "esm": "^3.0.84",
     "flow-bin": "^0.80.0",
     "nodemon": "^1.18.4",
     "prettier": "^1.14.2",

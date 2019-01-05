@@ -60,10 +60,8 @@ ckInst
   .then(res => console.log(res))
   .catch(e => console.log(e));
 
-ckInst
-  .getRoomMessages({ userId: "5ac5ebcd939b7f1712b92baf", roomId: 6899881 })
-  .then(res => console.log(res))
-  .catch(e => console.log(e));
+res = await ckInst
+  .getRoomMessages({ roomId: 6899881 });
 
 // gets 20 users at the time
 ckInst

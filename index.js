@@ -27,7 +27,7 @@ Rx.Observable.merge(
   // .do(() => console.time('timer'))
   .flatMap(() => ckHelper.getUsers())
   .flatMap(users => {
-    // console.log(`Searching messages of ${users.length} users`);
+    env.DEBUG && console.log(`Searching messages of ${users.length} users`);
     return ckHelper.populateUsersWithRoomsAndMessages(
       users,
       config.messagesToLoad
@@ -38,7 +38,7 @@ Rx.Observable.merge(
   .do(
     users =>
       env.DEBUG &&
-      console.log('Should send push messages to ' + users.length + ' users')
+      console.log(`Should send push messages to ${users.length} users`)
   )
   .filter(users => {
     // if (users.length === 0) {

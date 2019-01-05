@@ -51,10 +51,13 @@ export class PushHelper {
 
     // if (unreadMessagesCount === 1) {
     // title = 'New message';
-    let text = message.text;
+    let text;
 
     if (message.attachment) {
       text = 'Photo';
+    } else {
+      // remove new lines
+      text = message.text.replace(/[\s|\n|\r]{1,}/g, ' ');
     }
     // } else if (rooms.length === 1) {
     //   title = 'Unread messages';
@@ -73,17 +76,16 @@ export class PushHelper {
       storage.setItemSync(user.id + ':' + room.id, room.messages[0].id);
     });
 
-    text = text.replace(/[\s|\n|\r]{1,}/g, ' ');
+    const receiver = rooms[0].member_user_ids.find(
+      ids => ids !== message.user_id
+    );
 
     return {
       id: message.id,
-      // title,
       created_at: message.created_at,
       message: text,
-      // user_id: parseInt(user.id, 10),
-      // rooms: roomIds,
       roomId: rooms[0].id,
-      receiver: user.id,
+      receiver,
       senderId: message.user_id,
     };
   }
@@ -91,16 +93,18 @@ export class PushHelper {
   sendPushToUsers(users) {
     storage.initSync();
 
+    // console.log(users);
     const notifications = users
       .filter(u => u.id !== ONOVA_BOT_ID)
       .map(user => this.getNotificationUsers(user));
 
+    // console.log(notifications);
     const Promises = notifications
       .filter(notif => notif.receiver !== notif.senderId)
       .map(notification => {
+        // console.log(notification);
         return new Promise((resolve, reject) => {
           const {
-            // title,
             created_at,
             message,
             receiver,
@@ -110,7 +114,6 @@ export class PushHelper {
           const pushData = {
             message,
             created_at,
-            // title,
             triggeredBy: roomId,
             triggeredType: 'Room',
             // senderName: receiver.name,
