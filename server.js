@@ -5,7 +5,7 @@ import bodyParser from 'body-parser';
 import Chatkit from '@pusher/chatkit-server';
 // import logger from 'morgan';
 import Agenda from 'agenda';
-import Util, { JOBNAMES } from './util';
+import { JOBNAMES } from './util';
 
 const config = require('./config');
 const ONOVA_BOT_ID = '5bd1f7af46c62e6cdee546d0';
@@ -109,6 +109,7 @@ agenda.define(JOBNAMES.SYSTEM_MSG, async (job: Agenda.Job<any>, done) => {
     const roomId = allRooms[0].id;
     debug('adding onovabot to room id:', roomId);
 
+    // TODO: replace with chatkit.addUsersToRoom
     // make one user of the two add onovabot to the chat room Id
     await chatkit.apiRequest({
       method: 'PUT',
@@ -120,6 +121,7 @@ agenda.define(JOBNAMES.SYSTEM_MSG, async (job: Agenda.Job<any>, done) => {
     });
     debug('onovabot added successfully');
 
+    // TODO: replace with chatkit.sendMessage
     // send system message
     await chatkit.apiRequest({
       method: 'POST',

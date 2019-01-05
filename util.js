@@ -8,5 +8,3 @@ export const JOBNAMES = {
   // SCHEDULE: 'listing-schedule',
   SYSTEM_MSG: 'send-system-message',
 };
-
-export default class Util {}
