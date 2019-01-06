@@ -114,7 +114,7 @@ export class PushHelper {
           const pushData = {
             message,
             created_at,
-            triggeredBy: roomId,
+            triggeredBy: roomId.toString(),
             triggeredType: 'Room',
             // senderName: receiver.name,
             targetUser: receiver,
