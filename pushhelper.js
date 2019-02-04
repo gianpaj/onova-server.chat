@@ -3,8 +3,9 @@
 import Rx from 'rxjs/Rx';
 import request from 'request';
 import Agenda from 'agenda';
-import { JOBNAMES } from './util';
 const storage = require('node-persist');
+
+import { JOBNAMES } from './util';
 
 const config = require('./config');
 
@@ -125,7 +126,16 @@ export class PushHelper {
 
           const job = agenda.create(JOBNAMES.PUSH_MSG, pushData);
 
-          job.unique({ created_at, targetUser: receiver });
+          // check we're not sending double push notifications for System Notifications
+          if (senderId === ONOVA_BOT_ID) {
+            job.unique({
+              message, // unique tracking number
+              targetUser: receiver,
+              triggeredBy: roomId.toString(),
+            });
+          } else {
+            job.unique({ created_at, targetUser: receiver });
+          }
 
           return job.save(err => {
             if (err) {
