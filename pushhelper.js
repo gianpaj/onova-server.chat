@@ -111,6 +111,7 @@ export class PushHelper {
             receiver,
             roomId,
             senderId,
+            id,
           } = notification;
           const pushData = {
             message,
@@ -126,16 +127,8 @@ export class PushHelper {
 
           const job = agenda.create(JOBNAMES.PUSH_MSG, pushData);
 
-          // check we're not sending double push notifications for System Notifications
-          if (senderId === ONOVA_BOT_ID) {
-            job.unique({
-              message, // unique tracking number
-              targetUser: receiver,
-              triggeredBy: roomId.toString(),
-            });
-          } else {
-            job.unique({ created_at, targetUser: receiver });
-          }
+          // check we're not sending double push notifications
+          job.unique({ id });
 
           return job.save(err => {
             if (err) {
@@ -150,7 +143,7 @@ export class PushHelper {
     return Rx.Observable.of(Promise.all(Promises)).flatMap(() =>
       Rx.Observable.fromPromise(
         new Promise((resolve, reject) => {
-          return resolve(Promises.length);
+          resolve(Promises.length);
         })
       )
     );
