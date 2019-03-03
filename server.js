@@ -132,6 +132,8 @@ agenda.define(JOBNAMES.SYSTEM_MSG, async (job: Agenda.Job<any>, done) => {
       jwt: chatkit.generateAccessToken({ userId: ONOVA_BOT_ID }).token,
     });
 
+    debug(`onovabot sent ${message}`);
+
     done();
   } catch (error) {
     console.error(error);
