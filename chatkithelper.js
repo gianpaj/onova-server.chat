@@ -4,7 +4,7 @@ import Rx from 'rxjs/Rx';
 import request from 'request';
 
 export class ChatkitHelper {
-  constructor(chatkitInstance, pushHelperInstance) {
+  constructor(chatkitInstance, pushHelperInstance, apiVersion) {
     /**
      * @type Chatkit
      */
@@ -14,6 +14,11 @@ export class ChatkitHelper {
      * @type PushHelper
      */
     this.pushHelperInstance = pushHelperInstance;
+
+    /**
+     * @string API version (.e.g "v2")
+     */
+    this.apiVersion = apiVersion;
   }
 
   getUsers(): Observable {
@@ -39,7 +44,7 @@ export class ChatkitHelper {
       new Promise((resolve, reject) => {
         const [
           _,
-          apiVersion,
+          __,
           location,
           instanceId,
         ] = this.chatkitInstance.instanceLocator.match(
@@ -49,7 +54,7 @@ export class ChatkitHelper {
           'https://' +
             location +
             '.pusherplatform.io/services/chatkit_cursors/' +
-            apiVersion +
+            this.apiVersion +
             '/' +
             instanceId +
             '/cursors/0/users/' +
@@ -61,11 +66,11 @@ export class ChatkitHelper {
           },
           (error, response, body) => {
             if (!error && response.statusCode === 200) {
-              resolve(JSON.parse(body));
-            } else {
-              console.error('ERROR', error);
-              reject(error);
+              return resolve(JSON.parse(body));
             }
+            console.error('ERROR', error);
+            console.error(JSON.parse(body));
+            reject(error || body);
           }
         );
       })

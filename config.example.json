@@ -3,6 +3,7 @@
   "messagesToLoad": 5,
   "chatkit": {
     "instanceLocator": "",
-    "key": ""
+    "key": "",
+    "apiVersion": "v2"
   }
 }

@@ -17,7 +17,11 @@ const ckInst = new Chatkit({
 });
 
 const pushHelper = new PushHelper();
-const ckHelper = new ChatkitHelper(ckInst, pushHelper);
+const ckHelper = new ChatkitHelper(
+  ckInst,
+  pushHelper,
+  config.chatkit.apiVersion
+);
 
 Rx.Observable.merge(
   Rx.Observable.interval(config.pollingInterval * 1000),
