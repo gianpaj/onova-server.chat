@@ -109,27 +109,18 @@ agenda.define(JOBNAMES.SYSTEM_MSG, async (job: Agenda.Job<any>, done) => {
     const roomId = allRooms[0].id;
     debug('adding onovabot to room id:', roomId);
 
-    // TODO: replace with chatkit.addUsersToRoom
     // make one user of the two add onovabot to the chat room Id
-    await chatkit.apiRequest({
-      method: 'PUT',
-      path: `/rooms/${roomId}/users/add`,
-      body: {
-        user_ids: [ONOVA_BOT_ID],
-      },
-      jwt: chatkit.generateAccessToken({ userId: order.seller }).token,
+    await chatkit.addUsersToRoom({
+      roomId: roomId,
+      userIds: [ONOVA_BOT_ID],
     });
     debug('onovabot added successfully');
 
-    // TODO: replace with chatkit.sendMessage
     // send system message
-    await chatkit.apiRequest({
-      method: 'POST',
-      path: `/rooms/${roomId}/messages`,
-      body: {
-        text: message,
-      },
-      jwt: chatkit.generateAccessToken({ userId: ONOVA_BOT_ID }).token,
+    await chatkit.sendSimpleMessage({
+      userId: ONOVA_BOT_ID,
+      roomId: roomId,
+      text: message,
     });
 
     debug(`onovabot sent ${message}`);
