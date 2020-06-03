@@ -2,27 +2,53 @@
 
 import Rx from 'rxjs/Rx';
 import request from 'request';
+import Sendbird from 'sendbird-platform-api';
 
-export class ChatkitHelper {
-  constructor(chatkitInstance, pushHelperInstance, apiVersion) {
+export default class SendbirdHelper {
+  constructor(sendBirdAPIKey: string, pushHelperInstance) {
     /**
-     * @type Chatkit
+     * @type Sendbird
      */
-    this.chatkitInstance = chatkitInstance;
+    this.sb = Sendbird(sendBirdAPIKey);
 
     /**
      * @type PushHelper
      */
     this.pushHelperInstance = pushHelperInstance;
-
-    /**
-     * @string API version (.e.g "v2")
-     */
-    this.apiVersion = apiVersion;
   }
 
   getUsers(): Observable {
-    return Rx.Observable.fromPromise(this.chatkitInstance.getUsers());
+    const promise = this.sb.users
+      .list({
+        limit: 10,
+        active_mode: 'activated',
+        show_bot: false,
+      })
+      .then(result => result.users);
+    // this.chatkitInstance
+    //   .getUsers()
+    //   .then(a => console.log(a))
+    //   .catch(e => console.error(e));
+    return Rx.Observable.fromPromise(promise);
+  }
+
+  populateUsersWithRoomsAndMessages(users, messagesLimit) {
+    return Rx.Observable.combineLatest(
+      ...users.map(user =>
+        Rx.Observable.fromPromise(this.sb.users.myGroupChannelList({ user_id: user.user_id }))
+          .do(result => (user.channels = result.channels))
+          .flatMap(channels => {
+            if (channels.length < 1) return Rx.Observable.of([]);
+
+            return Rx.Observable.combineLatest(
+              ...channels.map(channel =>
+                this.getRoomMessages(user.id, channel.id, messagesLimit).do(messages => (channel.messages = messages))
+              )
+            );
+          })
+          .map(() => user)
+      )
+    );
   }
 
   getRoomMessages(userId: string, roomId: number, limit: number): Observable {
@@ -42,20 +68,13 @@ export class ChatkitHelper {
   getUserCursors(userId) {
     return Rx.Observable.fromPromise(
       new Promise((resolve, reject) => {
-        const [
-          _,
-          __,
-          location,
-          instanceId,
-        ] = this.chatkitInstance.instanceLocator.match(
+        const [_, __, location, instanceId] = this.chatkitInstance.instanceLocator.match(
           /^(v\d*):([a-z0-9]*):([a-f0-9\-]*)$/
         );
         request(
           'https://' +
             location +
             '.pusherplatform.io/services/chatkit_cursors/' +
-            this.apiVersion +
-            '/' +
             instanceId +
             '/cursors/0/users/' +
             userId,
@@ -74,29 +93,6 @@ export class ChatkitHelper {
           }
         );
       })
-    );
-  }
-
-  populateUsersWithRoomsAndMessages(users, messagesLimit) {
-    return Rx.Observable.combineLatest(
-      ...users.map(user =>
-        Rx.Observable.fromPromise(
-          this.chatkitInstance.getUserRooms({ userId: user.id })
-        )
-          .do(rooms => (user.rooms = rooms))
-          .flatMap(rooms => {
-            if (rooms.length < 1) return Rx.Observable.of([]);
-
-            return Rx.Observable.combineLatest(
-              ...rooms.map(room =>
-                this.getRoomMessages(user.id, room.id, messagesLimit).do(
-                  messages => (room.messages = messages)
-                )
-              )
-            );
-          })
-          .map(() => user)
-      )
     );
   }
 
@@ -129,11 +125,7 @@ export class ChatkitHelper {
           .map(room => {
             room.messages = room.messages
               // .filter(message => message.id > (user.cursors[room.id] || 0)) // Filter out messages that are read
-              .filter(
-                message =>
-                  message.id >
-                  this.pushHelperInstance.getLastPushedMessage(user.id, room.id)
-              );
+              .filter(message => message.id > this.pushHelperInstance.getLastPushedMessage(user.id, room.id));
 
             return room;
           })

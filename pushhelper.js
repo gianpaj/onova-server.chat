@@ -1,15 +1,13 @@
 // @flow
 
 import Rx from 'rxjs/Rx';
-import request from 'request';
+// import request from 'request';
 import Agenda from 'agenda';
-const storage = require('node-persist');
+import storage from 'node-persist';
 
 import { JOBNAMES } from './util';
 
 const config = require('./config');
-
-import { push } from './config.json';
 
 const ONOVA_BOT_ID = '5bd1f7af46c62e6cdee546d0';
 
@@ -21,7 +19,7 @@ const agenda = new Agenda({
   },
 });
 
-export class PushHelper {
+export default class PushHelper {
   constructor() {
     storage.initSync();
     console.log('node-persist initiated');
@@ -29,10 +27,8 @@ export class PushHelper {
 
   getNotificationUsers(user) {
     const rooms = user.rooms.map(room => {
-      room.messages
-        .filter(
-          message => message.id > this.getLastPushedMessage(user.id, room.id)
-        )
+      room.messages = room.messages
+        .filter(message => message.id > this.getLastPushedMessage(user.id, room.id))
         .map(() => room);
 
       return room;
@@ -77,9 +73,7 @@ export class PushHelper {
       storage.setItemSync(user.id + ':' + room.id, room.messages[0].id);
     });
 
-    const receiver = rooms[0].member_user_ids.find(
-      ids => ids !== message.user_id
-    );
+    const receiver = rooms[0].member_user_ids.find(ids => ids !== message.user_id);
 
     return {
       id: message.id,
@@ -95,50 +89,39 @@ export class PushHelper {
     storage.initSync();
 
     // console.log(users);
-    const notifications = users
-      .filter(u => u.id !== ONOVA_BOT_ID)
-      .map(user => this.getNotificationUsers(user));
+    const notifications = users.filter(u => u.id !== ONOVA_BOT_ID).map(user => this.getNotificationUsers(user));
 
     // console.log(notifications);
-    const Promises = notifications
-      .filter(notif => notif.receiver !== notif.senderId)
-      .map(notification => {
-        // console.log(notification);
-        return new Promise((resolve, reject) => {
-          const {
-            created_at,
-            message,
-            receiver,
-            roomId,
-            senderId,
-            id,
-          } = notification;
-          const pushData = {
-            message,
-            created_at,
-            triggeredBy: roomId.toString(),
-            triggeredType: 'Room',
-            // senderName: receiver.name,
-            targetUser: receiver,
-            senderId,
-          };
+    const Promises = notifications.filter(notif => notif.receiver !== notif.senderId).map(notification => {
+      // console.log(notification);
+      return new Promise((resolve, reject) => {
+        const { created_at, message, receiver, roomId, senderId, id } = notification;
+        const pushData = {
+          message,
+          created_at,
+          triggeredBy: roomId.toString(),
+          triggeredType: 'Room',
+          // senderName: receiver.name,
+          targetUser: receiver,
+          senderId,
+        };
 
-          config.DEBUG && console.log(pushData);
+        config.DEBUG && console.log(pushData);
 
-          const job = agenda.create(JOBNAMES.PUSH_MSG, pushData);
+        const job = agenda.create(JOBNAMES.PUSH_MSG, pushData);
 
-          // check we're not sending double push notifications
-          job.unique({ id });
+        // check we're not sending double push notifications
+        job.unique({ id });
 
-          return job.save(err => {
-            if (err) {
-              const e = new Error(`Job failed with error: ${err}`);
-              return reject(e);
-            }
-            resolve();
-          });
+        return job.save(err => {
+          if (err) {
+            const e = new Error(`Job failed with error: ${err}`);
+            return reject(e);
+          }
+          resolve();
         });
       });
+    });
 
     return Rx.Observable.of(Promise.all(Promises)).flatMap(() =>
       Rx.Observable.fromPromise(
@@ -200,72 +183,72 @@ export class PushHelper {
    * @param {Token} token
    * @returns {Observable<Token>}
    */
-  refreshToken(token) {
-    return Rx.Observable.fromPromise(
-      new Promise((resolve, reject) => {
-        request(
-          push.auth.endpoint,
-          {
-            json: true,
-            strictSSL: push.strictSSL,
-            body: {
-              client_id: push.auth.clientId,
-              client_secret: push.auth.clientSecret,
-              grant_type: push.auth.refreshGrantType,
-              refresh_token: token.refreshToken,
-            },
-            method: 'POST',
-          },
-          (error, response, body) => {
-            if (!error && response.statusCode === 200) {
-              return resolve(new Token(body));
-            }
-            console.log(error, response, body);
-            reject(error);
-          }
-        );
-      })
-    )
-      .catch(() => {
-        console.log('refresh token failed!');
-        return this.issueNewToken();
-      })
-      .do(token => (this.token = token));
-  }
+  // refreshToken(token) {
+  //   return Rx.Observable.fromPromise(
+  //     new Promise((resolve, reject) => {
+  //       request(
+  //         push.auth.endpoint,
+  //         {
+  //           json: true,
+  //           strictSSL: push.strictSSL,
+  //           body: {
+  //             client_id: push.auth.clientId,
+  //             client_secret: push.auth.clientSecret,
+  //             grant_type: push.auth.refreshGrantType,
+  //             refresh_token: token.refreshToken,
+  //           },
+  //           method: 'POST',
+  //         },
+  //         (error, response, body) => {
+  //           if (!error && response.statusCode === 200) {
+  //             return resolve(new Token(body));
+  //           }
+  //           console.log(error, response, body);
+  //           reject(error);
+  //         }
+  //       );
+  //     })
+  //   )
+  //     .catch(() => {
+  //       console.log('refresh token failed!');
+  //       return this.issueNewToken();
+  //     })
+  //     .do(token => (this.token = token));
+  // }
 
   /**
    * @returns {Observable<Token>}
    */
-  issueNewToken() {
-    return Rx.Observable.fromPromise(
-      new Promise((resolve, reject) => {
-        request(
-          push.auth.endpoint,
-          {
-            json: true,
-            strictSSL: push.strictSSL,
-            body: {
-              client_id: push.auth.clientId,
-              client_secret: push.auth.clientSecret,
-              grant_type: push.auth.grantType,
-            },
-            method: 'POST',
-          },
-          (error, response, body) => {
-            if (!error && response.statusCode === 200) {
-              return resolve(new Token(body));
-            }
-            console.error(error);
-            reject(error);
-          }
-        );
-      })
-    ).do(token => (this.token = token));
-  }
+  // issueNewToken() {
+  //   return Rx.Observable.fromPromise(
+  //     new Promise((resolve, reject) => {
+  //       request(
+  //         push.auth.endpoint,
+  //         {
+  //           json: true,
+  //           strictSSL: push.strictSSL,
+  //           body: {
+  //             client_id: push.auth.clientId,
+  //             client_secret: push.auth.clientSecret,
+  //             grant_type: push.auth.grantType,
+  //           },
+  //           method: 'POST',
+  //         },
+  //         (error, response, body) => {
+  //           if (!error && response.statusCode === 200) {
+  //             return resolve(new Token(body));
+  //           }
+  //           console.error(error);
+  //           reject(error);
+  //         }
+  //       );
+  //     })
+  //   ).do(token => (this.token = token));
+  // }
 
-  getLastPushedMessage(userId, roomId): Promise<any> {
-    return storage.getItemSync(userId + ':' + roomId) || 0;
-  }
+  // getLastPushedMessage(userId, roomId): Promise<any> {
+  //   return storage.getItemSync(userId + ':' + roomId) || 0;
+  // }
 }
 
 class Token {

@@ -10,7 +10,6 @@
     "@babel/preset-flow": "^7.0.0",
     "@pusher/chatkit-server": "^1.1.0",
     "agenda": "^1.0.3",
-    "babel-eslint": "^9.0.0",
     "body-parser": "^1.18.2",
     "dotenv": "^6.0.0",
     "express": "^4.16.3",
@@ -18,6 +17,7 @@
     "node-persist": "^2.1.0",
     "request": "^2.88.0",
     "rxjs": "^5.5.6",
+    "sendbird-platform-api": "^1.2.0",
     "winston": "2.4.1"
   },
   "scripts": {
@@ -27,25 +27,27 @@
     "prod:start-push": "node lib/index.js",
     "start": "yarn prod:build && yarn prod:start",
     "start-push": "yarn prod:build && yarn prod:start-push",
-    "dev:start": "nodemon --ignore lib --exec babel-node server.js",
-    "dev:start-push": "nodemon --ignore lib --exec babel-node index.js"
+    "start:dev": "nodemon --ignore lib --exec babel-node server.js",
+    "start:dev-push": "nodemon --ignore lib --exec babel-node index.js"
   },
   "devDependencies": {
     "@babel/node": "^7.0.0",
+    "babel-eslint": "^10.0.1",
     "eslint": "^5.5.0",
-    "eslint-config-prettier": "^3.0.1",
-    "eslint-plugin-flowtype": "^2.46.2",
-    "eslint-plugin-import": "^2.14.0",
-    "eslint-plugin-prettier": "^2.6.0",
+    "eslint-config-prettier": "^6.0.0",
+    "eslint-plugin-flowtype": "^3.2.0",
+    "eslint-plugin-import": "^2.18.0",
+    "eslint-plugin-prettier": "^3.1.0",
     "esm": "^3.0.84",
-    "flow-bin": "^0.80.0",
+    "flow-bin": "^0.82.0",
     "nodemon": "^1.18.4",
-    "prettier": "^1.14.2",
+    "prettier": "^1.16.0",
+    "prettier-eslint-cli": "4.7.1",
     "rimraf": "^2.6.2"
   },
   "engineStrict": true,
   "engines": {
-    "node": ">=8.11",
+    "node": ">=12",
     "npm": ">=5.6.0",
     "yarn": ">=1.3.0"
   },

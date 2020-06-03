@@ -1,15 +1,17 @@
 // require and configure dotenv, will load vars in .env file in process.env
 require('dotenv').config();
 
-const { DEBUG, MONGO_URI, PORT, ENDPOINT } = process.env;
+const { DEBUG, MONGO_URI, PORT, POLLINGINTERVAL, MESSAGESTOLOAD, SENDBIRD_KEY } = process.env;
 const config = {
   DEBUG: DEBUG == 'true',
-  ENDPOINT: ENDPOINT || '/pusher/auth',
   MONGO_URI,
   PORT,
+  POLLINGINTERVAL,
+  MESSAGESTOLOAD,
+  SENDBIRD_KEY,
 };
 
-const requiredKeys = ['MONGO_URI', 'ENDPOINT'];
+const requiredKeys = ['MONGO_URI', 'SENDBIRD_KEY'];
 requiredKeys.forEach(key => {
   if (!config[key]) throw new Error(getMissingKeyErrorString(key));
 });
