@@ -4323,8 +4323,10 @@ semver@^5.4.1, semver@^5.5.1:
   resolved "https://registry.yarnpkg.com/semver/-/semver-5.5.1.tgz#7dfdd8814bdb7cabc7be0fb1d734cfb66c940477"
   integrity sha512-PqpAxfrEhlSUWge8dwIp4tZnQ25DIOthpiaHNIthsjEFQD6EvqUKUDM7L8O2rShkFccYo1VjJR0coWfNkCubRw==
 
-"sendbird-platform-api@file:../../temp/sendbird-nodejs":
+sendbird-platform-api@1.2.0:
   version "1.2.0"
+  resolved "https://registry.yarnpkg.com/sendbird-platform-api/-/sendbird-platform-api-1.2.0.tgz#bd5867b5d593f28e0838b9d6dc8a1190e4b2c7f2"
+  integrity sha512-R+008ZDJJr5EsdbnfTjn17vdCbfuYQiSI+zsnph+0R7rx/VaxR3OM+Myg53pmLl0gA9Uex/ZxYuwDZxJJRfcdw==
   dependencies:
     bluebird "3.4.6"
     lodash "^4.17.11"
