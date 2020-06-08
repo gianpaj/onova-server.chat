@@ -1,7 +1,4 @@
-# Pusher Auth REST API and Push notification polling for ChatKit
-
-`index.js` inspired from
-https://github.com/gildebrand/chatkit-push-helper
+# Job scheduler part that sends a message for Sendbird bots
 
 ## helpful code snippets
 
@@ -12,39 +9,7 @@ From the command line on this folder:
 ```js
 const Chatkit = require('@pusher/chatkit-server');
 
-const config = require('./config.json');
-
-const ckInst = new Chatkit.default({
-  instanceLocator: config.chatkit.instanceLocator,
-  key: config.chatkit.key
-});
-
-ckInst
-  .updatePermissionsForGlobalRole({
-    roleName: "default",
-    permissionsToAdd: [
-      "cursors:read:get",
-      "cursors:read:set",
-      "file:create",
-      "file:get",
-      "message:create",
-      "presence:subscribe",
-      "room:create",
-      "room:delete",
-      "room:get",
-      "room:join",
-      "room:messages:get",
-      "room:typing_indicator:create",
-      "room:update"
-      "user:get",
-      "user:rooms:get",
-    ]
-  })
-  .then(() => {
-    console.log("updatePermissionsForGlobalRole Success");
-  });
-
-ckInst.getRoles().then(res => console.log(res)).catch(e => console.log(e));
+const env = require('./config.js');
 
 ckInst
   .getUserRooms({ userId: "5ae041ae953aa0350cface75" })

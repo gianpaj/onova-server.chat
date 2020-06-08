@@ -1,76 +1,28 @@
 // @flow
 
-import express from 'express';
-import bodyParser from 'body-parser';
-import Chatkit from '@pusher/chatkit-server';
+import Sendbird from 'sendbird-platform-api';
 // import logger from 'morgan';
 import Agenda from 'agenda';
-import { JOBNAMES } from './util';
+import { createHash } from 'crypto';
 
-const config = require('./config');
-const ONOVA_BOT_ID = '5bd1f7af46c62e6cdee546d0';
+import { JOBNAMES, debug } from './util';
+
+const env = require('./config');
+
+if (env.DEBUG) console.log('Debugging is enabled');
+else console.log('Debugging is disabled');
+
+// const ONOVA_BOT_ID = '5bd1f7af46c62e6cdee546d0';
 
 const agenda = new Agenda({
   db: {
-    address: config.MONGO_URI,
+    address: env.MONGO_URI,
     maxConcurrency: 2,
     defaultLockLifetime: 5000, // seconds
   },
 });
 
-const app = express();
-const port = process.env.PORT || 8142;
-const configJSON = require('./config.json');
-const chatkit = new Chatkit({
-  instanceLocator: configJSON.chatkit.instanceLocator,
-  key: configJSON.chatkit.key,
-});
-
-const debug = (...args) => {
-  if (config.DEBUG) console.log('debug::: ', ...args);
-};
-
-// Allow CORS
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  next();
-});
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-
-app.post(config.ENDPOINT, (req, res, next) => {
-  debug('received auth request');
-  debug('req.body:', req.body);
-  // Some logic to determine whether the user making the request has access to
-  // the private channel
-  // TODO: validate JWT token
-
-  const { grant_type } = req.body;
-
-  try {
-    if (grant_type !== 'client_credentials') {
-      throw new Error('Invalid request');
-    }
-    // const { token, avatarURL, username } = req.headers;
-    const { user_id } = req.query;
-
-    const auth = chatkit.authenticate({
-      userId: user_id,
-      authPayload: req.body,
-    });
-    console.log('authenticated', user_id);
-    return res.json(auth.body);
-  } catch (error) {
-    return res.status(500).json({ ok: false, error });
-  }
-});
-
-app.listen(port, () => {
-  let msg = '';
-  if (config.DEBUG) msg = '(DEBUG mode)';
-  console.info('server started on port:', port, msg);
-});
+const sb = Sendbird(env.SENDBIRD_KEY);
 
 agenda.on('complete', job => {
   debug(job.attrs.data);
@@ -99,31 +51,28 @@ agenda.define(JOBNAMES.SYSTEM_MSG, async (job: Agenda.Job<any>, done) => {
 
   try {
     // the seller should have created the room already
-    const sellerRooms = await chatkit.getUserRooms({ userId: order.seller });
-    const allRooms = sellerRooms.filter(r => r.name == getRoomName(order));
 
-    if (allRooms.length !== 1) {
-      console.log(allRooms);
-      throw new Error('error getting user rooms');
-    }
-    const roomId = allRooms[0].id;
-    debug('adding onovabot to room id:', roomId);
+    const channelUrl = await getChannelUrl(order);
+    debug('adding onovabot to channelUrl:', channelUrl);
 
-    // make one user of the two add onovabot to the chat room Id
-    await chatkit.addUsersToRoom({
-      roomId: roomId,
-      userIds: [ONOVA_BOT_ID],
-    });
-    debug('onovabot added successfully');
+    // // make one user of the two add onovabot to the chat room Id
+    // await sb.bots.join({
+    //   bot_user_id: ONOVA_BOT_ID,
+    //   channel_urls: [getRoomName(order)],
+    // });
+    // debug('onovabot added successfully');
 
-    // send system message
-    await chatkit.sendSimpleMessage({
-      userId: ONOVA_BOT_ID,
-      roomId: roomId,
-      text: message,
-    });
+    // sb.bots.sendMessage({
+    //   bot_user_id: ONOVA_BOT_ID,
+    //   message: message,
+    //   channel_url: getRoomName(order),
+    // });
 
-    debug(`onovabot sent ${message}`);
+    const res = await sendAdminMessage(message, channelUrl);
+
+    console.log(res);
+
+    debug(`admin msg sent: ${message}`);
 
     done();
   } catch (error) {
@@ -140,4 +89,51 @@ function getRoomName(o: Order): string {
     ids = [o.buyer, o.seller];
   }
   return ids.sort().join('-');
+}
+
+async function getChannelUrl(order: Order): Promise<string> {
+  // find a users channels
+  const [userA, userB] = await Promise.all([
+    sb.users.myGroupChannelList(order.buyer._id, { limit: 100 }),
+    sb.users.myGroupChannelList(order.seller._id, { limit: 100 }),
+  ]);
+
+  const channels = userA.channels.filter(a => userB.channels.find(b => b.channel_url == a.channel_url));
+
+  if (channels.length > 1) {
+    console.log(channels);
+    throw new Error('too many channels');
+  }
+  if (!channels.length) {
+    console.log(channels);
+    throw new Error('no channels found for both users');
+  }
+  return channels[0].channel_url;
+}
+
+async function sendAdminMessage(message: string, channelUrl: string): Promise<any> {
+  try {
+    const res = await sb.groupChannels.messages.send(channelUrl, {
+      message_type: 'ADMM',
+      message,
+      send_push: true,
+      dedup_id: generateHash(message),
+    });
+    console.log(res);
+    return res;
+  } catch (error) {
+    if (error.error.code == 400202) {
+      // "dedup_id" violates unique constraint.
+      console.debug('same message already sent');
+    } else {
+      console.error(error);
+      throw error;
+    }
+  }
+}
+
+function generateHash(text: string) {
+  return createHash('md5')
+    .update(text)
+    .digest('hex');
 }

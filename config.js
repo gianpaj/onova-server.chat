@@ -1,13 +1,10 @@
 // require and configure dotenv, will load vars in .env file in process.env
 require('dotenv').config();
 
-const { DEBUG, MONGO_URI, PORT, POLLINGINTERVAL, MESSAGESTOLOAD, SENDBIRD_KEY } = process.env;
+const { DEBUG, MONGO_URI, SENDBIRD_KEY } = process.env;
 const config = {
   DEBUG: DEBUG == 'true',
   MONGO_URI,
-  PORT,
-  POLLINGINTERVAL,
-  MESSAGESTOLOAD,
   SENDBIRD_KEY,
 };
 

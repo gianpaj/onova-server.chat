@@ -1,34 +1,27 @@
 {
   "name": "onova.server.chat",
-  "version": "1.0.0",
-  "description": "Pusher Auth REST API and Push notification polling for ChatKit",
+  "version": "2.0.0",
+  "description": "Chat server for orders chatbot with Sendbird",
   "dependencies": {
     "@babel/cli": "^7.2.0",
     "@babel/core": "^7.2.0",
     "@babel/plugin-proposal-object-rest-spread": "^7.3.0",
     "@babel/preset-env": "^7.3.0",
     "@babel/preset-flow": "^7.0.0",
-    "@pusher/chatkit-server": "^1.1.0",
     "agenda": "^1.0.3",
-    "body-parser": "^1.18.2",
     "dotenv": "^6.0.0",
-    "express": "^4.16.3",
     "morgan": "^1.9.0",
     "node-persist": "^2.1.0",
     "request": "^2.88.0",
-    "rxjs": "^5.5.6",
-    "sendbird-platform-api": "^1.2.0",
+    "sendbird-platform-api": "/Users/gianfranco/temp/sendbird-nodejs",
     "winston": "2.4.1"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "prod:build": "rimraf lib && babel *.js -d lib --ignore .test.js && cp -r config.json ./lib",
     "prod:start": "node lib/server.js",
-    "prod:start-push": "node lib/index.js",
     "start": "yarn prod:build && yarn prod:start",
-    "start-push": "yarn prod:build && yarn prod:start-push",
-    "start:dev": "nodemon --ignore lib --exec babel-node server.js",
-    "start:dev-push": "nodemon --ignore lib --exec babel-node index.js"
+    "start:dev": "nodemon --ignore lib --exec babel-node server.js"
   },
   "devDependencies": {
     "@babel/node": "^7.0.0",
