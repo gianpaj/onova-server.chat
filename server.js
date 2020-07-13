@@ -23,7 +23,7 @@ const agenda = new Agenda({
   },
 });
 
-const sb = Sendbird(env.SENDBIRD_KEY);
+const sb = Sendbird(env.SENDBIRD_KEY, env.SENDBIRD_URL);
 
 agenda.on('complete', job => {
   debug(job.attrs.data);
