@@ -1,4 +1,32 @@
-# Job scheduler part that sends a message for Sendbird bots
+# Onova chat server (`server.chat`)
+
+> Part of [Onova](https://www.onova.co/), a mobile marketplace for second-hand and sustainable clothing that [Gianfranco Palumbo](https://github.com/gianpaj) and Alex Kostinskyi built in Lviv, Ukraine. The company ran until September 2019. This repository is an archive and is not maintained.
+
+Buyers and sellers could chat once an order was paid and confirmed. This service is an [Agenda](https://github.com/agenda/agenda) worker that posts system messages into those chats as an order changes state, such as paid, confirmed or shipped. In its first version it also served a small REST API that authenticated app users with Pusher ChatKit.
+
+Chat ran on Pusher ChatKit from 2018. Pusher shut ChatKit down in 2020, so in June 2020 the service moved to Sendbird. Photos in chat never went through the chat provider: the apps uploaded them to Google Cloud Storage through `server.data`.
+
+| | |
+|---|---|
+| First commit | 2018-03-07 |
+| Last commit | 2020-07-13 |
+| Commits | 76 (69 by Gianfranco) |
+| Code | about 250 lines of JavaScript |
+
+### Onova repositories
+
+- [onova-mobileapp](https://github.com/gianpaj/onova-mobileapp): the Onova and Drop iOS and Android apps
+- [onova-server.data](https://github.com/gianpaj/onova-server.data): the REST API
+- [onova-server.data.global](https://github.com/gianpaj/onova-server.data.global): the API fork for an international version
+- [onova-server.push](https://github.com/gianpaj/onova-server.push): push notifications
+- [onova-server.chat](https://github.com/gianpaj/onova-server.chat): order messages in buyer–seller chats
+- [onova-webapp-drop](https://github.com/gianpaj/onova-webapp-drop): the Drop web app
+- [onova-forest-admin](https://github.com/gianpaj/onova-forest-admin): the back office
+- [onova-automl-server](https://github.com/gianpaj/onova-automl-server): an image classifier prototype
+
+---
+
+## Original README
 
 ## helpful code snippets
 
